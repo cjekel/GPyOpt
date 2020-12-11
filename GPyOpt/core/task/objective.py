@@ -39,14 +39,16 @@ class SingleObjective(Objective):
         self.num_evaluations = 0
         self.space = space
         self.objective_name = objective_name
+        self.batch_type = batch_type
 
 
     def evaluate(self, x):
         """
         Performs the evaluation of the objective at x.
         """
-
-        if self.n_procs == 1:
+        if self.batch_type == "CJ":
+            f_evals, cost_evals = self._par_eval_func(x)
+        elif self.n_procs == 1:
             f_evals, cost_evals = self._eval_func(x)
         else:
             try:
@@ -74,6 +76,21 @@ class SingleObjective(Objective):
             rlt = self.func(np.atleast_2d(x[i]))
             f_evals     = np.vstack([f_evals,rlt])
             cost_evals += [time.time()-st_time]
+        return f_evals, cost_evals
+
+
+    def _par_eval_func(self, x):
+        """
+        Eval All values at once
+        """
+        cost_evals = np.ones((x.shape[0], 1))
+        f_evals     = np.empty((x.shape[0], 1))
+        f_evals[:] = self.func(x)
+        # # for i in range(x.shape[0]):
+        #     # st_time    = time.time()
+        #     rlt = self.func(np.atleast_2d(x[i]))
+        #     f_evals     = np.vstack([f_evals,rlt])
+        #     cost_evals += [time.time()-st_time]
         return f_evals, cost_evals
 
 
