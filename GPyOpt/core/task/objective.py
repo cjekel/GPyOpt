@@ -47,6 +47,7 @@ class SingleObjective(Objective):
         Performs the evaluation of the objective at x.
         """
         if self.batch_type == "CJ":
+            print("CJCJCJCJCJCJ")
             f_evals, cost_evals = self._par_eval_func(x)
         elif self.n_procs == 1:
             f_evals, cost_evals = self._eval_func(x)
